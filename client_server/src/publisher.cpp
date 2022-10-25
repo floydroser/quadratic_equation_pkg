@@ -1,14 +1,13 @@
-
 #include "ros/ros.h"
-#include "my_service/QuadRoots.h"
+#include "quad_service/QRoots.h"
 #include <iostream>
 
 int main(int argc, char **argv) {
     ros::init(argc,argv,"quad_roots_publisher");
 
     ros::NodeHandle n;
-    ros::ServiceClient client=n.serviceClient<my_service::QuadRoots>("quad_roots");
-    my_service::QuadRoots srv;
+    ros::ServiceClient client=n.serviceClient<quad_service::QRoots>("quad_roots");
+    quad_service::QRoots srv;
 
     while (ros::ok()) {
 
@@ -22,10 +21,21 @@ int main(int argc, char **argv) {
 
         srv.request.a = a;
         srv.request.b = b;
-	srv.request.c = c;
+  	srv.request.c = c;
+
+	float d = b * b - 4 * a * c;
 
         if (client.call(srv)) {
-            std::cout<<"roots: "<<srv.response.x1<<" and "<<srv.response.x2<<std::endl;
+
+		if (d > 0) {
+            		ROS_INFO("[%f %f]", srv.response.x[0], srv.response.x[1]);
+		}
+		if (d == 0) {
+            		ROS_INFO("[%f]", srv.response.x[0]);
+		}
+		if (d < 0) {
+            		ROS_INFO("[ ]");
+		}
         }
 
         else {
@@ -36,4 +46,3 @@ int main(int argc, char **argv) {
 
     return 0;
 }
-
